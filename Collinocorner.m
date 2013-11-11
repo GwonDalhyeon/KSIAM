@@ -2,6 +2,10 @@
 clc
 clear all
 %% Constants and Variables
+% sdksajfdkl;safjdklsa;fjsad;lfjsdl;afjkl;asda;f
+
+
+asdj;flkj;asdklf;
 L=5;
 T=0.1;
 dx = 1/20;
@@ -28,10 +32,7 @@ beta =  2/(2*L+1) * (sin(angle)).^2;
 
 %% Fourier transforming with initial and boundary conditions, find auxiliary function in a domain.
 
-% model problem 
-% u_tt = u_xx + u_yy on [-1,0]X[-1,0]
-% u(x,y,t)=f(x,y,t)=0 for (x,y) on the boundary : boundary condition
-% u(x,y,0) = sin(pi*x)*sin(2*pi*y), u_t(x,y,0) = 0 : boundary condition
+
 syms x y t k1 k2 w
 f = @(x,y,t) exp(-x^2-y^2-t^2);
 g = fourier(fourier(f,x,k1),t,w);
