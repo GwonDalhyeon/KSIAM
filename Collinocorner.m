@@ -2,10 +2,6 @@
 clc
 clear all
 %% Constants and Variables
-% sdksajfdkl;safjdklsa;fjsad;lfjsdl;afjkl;asda;f
-
-
-asdj;flkj;asdklf;
 L=5;
 T=0.1;
 dx = 1/20;
@@ -18,7 +14,7 @@ alpha = zeros(L,1);
 beta = zeros(L,1);
 C = zeros(L);
 A = zeros(L,1);
-u = zeros(Nx+1,Ny+1,Nt+1);5
+u = zeros(Nx+1,Ny+1,Nt+1);
 angle = zeros(L,1);
 M =zeros(2*L,2*L); % matrix corresponding to linear system for obtaining auxiliary function on the semi-boundary node
 P1 = zeros(L) ; 
@@ -32,18 +28,19 @@ beta =  2/(2*L+1) * (sin(angle)).^2;
 
 %% Fourier transforming with initial and boundary conditions, find auxiliary function in a domain.
 
-
+% model problem 
+% u_tt = u_xx + u_yy on [-1,0]X[-1,0]
+% u(x,y,t)=f(x,y,t)=0 for (x,y) on the boundary : boundary condition
+% u(x,y,0) = sin(pi*x)*sin(2*pi*y), u_t(x,y,0) = 0 : boundary condition
 syms x y t k1 k2 w
-f = @(x,y,t) exp(-x^2-y^2-t^2);
-g = fourier(fourier(f,x,k1),t,w);
-psi_cell = cell(4,L);
+f = @(x,y,t) 0
+g = fourier(fourier(f,x,k1),t,w)
+
 for l=1:5
-    
-%     eval(['phi1_temp', num2str(l), ' = @(k1,w)',char(g)]);
-%     psi_cell{1,l} = eval(['phi2_temp', num2str(l), '=@(k2,w)', char(g)]);
-    eval(['phi2_temp', num2str(l), '=@(k2,w)', char(g)]);
-    psi_cell{1,l} = eval(['phi2_temp', num2str(l)]);
-    
+
+    % eval(['phi1_temp', num2str(l), ' = @(k1,w)',char(g)]);
+     array{i} = {eval(['phi2_temp', num2str(l), '=@(k2,w)', char(g)])};
+
 end
     
 
