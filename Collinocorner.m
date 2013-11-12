@@ -9,12 +9,12 @@ dy = 1/20;
 dt = 1/1000;
 Nx = 21;
 Ny = 21;
-Nt = round(T/dt)
+Nt = round(T/dt);
 alpha = zeros(L,1);
 beta = zeros(L,1);
 C = zeros(L);
 A = zeros(L,1);
-u = zeros(Nx+1,Ny+1,Nt+1);5
+u = zeros(Nx+1,Ny+1,Nt+1);
 angle = zeros(L,1);
 M =zeros(2*L,2*L); % matrix corresponding to linear system for obtaining auxiliary function on the semi-boundary node
 P1 = zeros(L) ; 
@@ -33,19 +33,69 @@ beta =  2/(2*L+1) * (sin(angle)).^2;
 % u(x,y,t)=f(x,y,t)=0 for (x,y) on the boundary : boundary condition
 % u(x,y,0) = sin(pi*x)*sin(2*pi*y), u_t(x,y,0) = 0 : boundary condition
 syms x y t k1 k2 w
-f = @(x,y,t) exp(-x^2-y^2-t^2);
-g = fourier(fourier(f,x,k1),t,w);
-psi_cell = cell(4,L);
-for l=1:5
+f = @(x,y,t) exp(-x.^2-y.^2-t.^2);
+
+% g = fourier(fourier(f,x,k1),t,w);
+% psi_cell = cell(4,L);
+% for l=1:5
     
 %     eval(['phi1_temp', num2str(l), ' = @(k1,w)',char(g)]);
 %     psi_cell{1,l} = eval(['phi2_temp', num2str(l), '=@(k2,w)', char(g)]);
-    eval(['phi2_temp', num2str(l), '=@(k2,w)', char(g)]);
-    psi_cell{1,l} = eval(['phi2_temp', num2str(l)]);
-    
-end
-    
+%     eval(['phi2_temp', num2str(l), '=@(k2,w)', char(g)]);
+%     psi_cell{1,l} = eval(['phi2_temp', num2str(l)]);
+%     
+% end
 
+
+[X,Y] = meshgrid(-1:dx:1,-1:dy:1); 
+Xsize=size(X,2);
+Ysize=size(Y,2);
+tGrid = [-0.5:0.1:0.5];
+tGridSize=size(tGrid,2);
+B = zeros(tGridSize,Xsize);
+
+
+% Find PHI2
+for i=1:tGridSize
+    B(i,:) = f(X(1,:),0,tGrid(i));
+end
+
+FB = fft2(B);
+
+[K1,W] = meshgrid(-1:dx:1,-0.5:0.1:0.5);
+[K2,W] = meshgrid(-1:dx:1,-0.5:0.1:0.5);
+% W = [-0.5:0.1:0.5];
+FB_temp = zeros(tGridSize, Xsize, L);
+
+for l=1:L
+    for i=1:tGridSize
+        FB_temp(i,:,l) = K1(1,:).^2/(W(i,:).^2 - alpha(l).*K1(1,:).^2).*FB(i,:);
+    end
+end
+
+IFB2 = ifft2(FB_temp); % inverse fourier transform
+
+
+% Find PHI1
+
+C= f(0,Y,T);
+FC = fft2(C);
+
+for i=1:tGridSize
+    C(i,:) = f(0,Y(:,1)',tGrid(i));
+end
+
+FC = fft2(C);
+
+FC_temp = zeros(tGridSize, Ysize, L);
+
+for l=1:L
+    for i=1:tGridSize
+        FC_temp(i,:,l) = K2(1,:).^2/(W(i,:).^2 - alpha(l).*K2(1,:).^2).*FC(i,:);
+    end
+end
+
+IFC2 = ifft(FC_temp); % inverse fourier transform
 %% initial data pluginÇØ¾ßÇÔ
 
 for l=1:L
