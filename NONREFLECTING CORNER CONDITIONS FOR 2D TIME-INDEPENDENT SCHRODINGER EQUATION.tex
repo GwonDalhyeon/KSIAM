@@ -1,0 +1,489 @@
+\documentclass{beamer}%[slidestop,compress,mathserif]
+\usetheme{default}
+\usepackage{beamerthemeshadow}
+%\usetheme{default}
+\logo{\includegraphics[height=0.7cm]{Llogo.png}}
+\usetheme{Ilmenau} % Beamer theme v 3.0
+\useoutertheme{miniframes}
+%\useoutertheme{default}
+\usepackage{amsfonts,amssymb,amsmath,mathrsfs,graphicx}
+\setbeamercolor{frametitle}{fg=black,bg=white}
+%\usepackage{subfigure}
+\usefonttheme[onlysmall]{structurebold}
+
+\begin{document}
+
+\title{NONREFLECTING CORNER CONDITIONS FOR 2D TIME-INDEPENDENT SCHRODINGER EQUATION}
+\institute{Seoul National University}
+\author{Han Heejae, Gwon Dalhyeon,\\ Kim Hanchul and Kang Myungjoo}
+\date{Nov 19th, 2013}
+\frame{\titlepage}
+%\frame{\frametitle{Table of contents}\tableofcontents}
+\frame{\tableofcontents}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% section 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+% page1
+\subsection{}
+\frame
+{
+%\frametitle{Linear Advection Equation}
+\small 
+
+\begin{block}{The wave equation}
+$$\dfrac{\partial^2 w}{\partial t^2}-\dfrac{\partial^2 w}{\partial x^2}-\dfrac{\partial^2 w}{\partial y^2}=0$$
+\end{block}
+$\circ$ We derive \textcolor{red}{non-reflecting boundary conditions} on the wall $y=0$ for wave equation in $t,~y \geq 0$\\
+
+$\circ$ 2D wave solutions traveling to the left are
+$$w= \exp(i(k_1 x + \omega t + \sqrt{\omega^2-k_1^2}y)), ~ \omega^2-k_1^2 >0, ~\omega>0  $$
+$\circ$ $\omega$ : the interpretation of frequency\\
+$\circ$ $\dfrac{k_1}{\omega}=\sin\theta$, where $\theta$ is the angle of incidence of the wave upon the boundary $y=0$.
+}
+
+
+% page2
+\frame
+{
+\small
+$\circ$ For fixed $\omega, k_1$, boundary condition is given by a zero coefficient
+$$\left(\dfrac{d}{dy}-i\sqrt{\omega^2-k_1^2}\right)w|_{y=0}=0$$
+
+$\circ$ In general, 
+$$w(x,y,t)=\iint_{\omega^2-k_1^2 >0}\exp(i(k_1 x + \omega t + \sqrt{\omega^2-k_1^2}y))\hat{w}(k_1, 0,  \omega)d\omega dk_1$$
+
+\Rightarrow ~
+$\left(\dfrac{\partial}{\partial y}-\sqrt{\dfrac{\partial^2}{\partial t^2}-\dfrac{\partial^2}{\partial x^2}}\right)w|_{y=0}=0$, where
+$\displaystyle \sqrt{\dfrac{\partial^2}{\partial t^2}-\dfrac{\partial^2}{\partial x^2}}=\iint \sqrt{\omega^2-k_1^2}\exp(i(k_1 x + \omega t))\hat{w}(k_1, 0,  \omega)d\omega dk_1$
+
+}
+
+
+% page3
+\frame
+{
+\frametitle{Pade approxiamation}
+\small
+$\circ$ Pade approximations of the function $z \rightarrow \sqrt{1-z}$ are
+\begin{itemize}
+  \item (1st) $\sqrt{1-z}=1+O(x)$
+  \item (2nd) $\sqrt{1-z}=1-\dfrac{1}{2}z+O(z^2)$
+  \item (3rd) $\sqrt{1-z}=1-\dfrac{z}{2-z/2}+O(z^3)$
+\end{itemize}
+
+
+}
+
+% page4
+\frame
+{
+%\frametitle{}
+\small
+\quad We observe that under Fourier transform
+$$i\omega \leftrightarrow \dfrac{\partial}{\partial t}, ~ik_1 \leftrightarrow \dfrac{\partial}{\partial x}$$
+\quad By Pade approximations, absorbing boundary conditions for the wave equation on the wall $y=0$:\newline
+From $\left(\dfrac{\partial}{\partial y}-\sqrt{\dfrac{\partial^2}{\partial t^2}-\dfrac{\partial^2}{\partial x^2}}\right)w|_{y=0}=0$,
+\begin{itemize}
+  \item (1st approx.) $w_y-w_t|_{y=0}=0$
+  \item (2nd approx.) $w_{yt}-w_{tt}+\dfrac{1}{2}w_{xx}|_{y=0}=0$
+  \item (3rd approx.) $w_{ytt}-w_{ttt}-\dfrac{1}{4}w_{yxx}+\dfrac{3}{4}w_{txx}|_{y=0}=0$
+\end{itemize}
+}
+
+% page5
+\frame
+{
+%\frametitle{}
+\small
+\quad However, these conditions do not always give satisfactory solutions for
+\begin{enumerate}
+  \item long time simulations
+  \item , or when the size of the computational box is small with respect to the wavelength.
+\end{enumerate}\\
+$\Rightarrow$ \textcolor{red}{Increasing the order of the approximation.}
+
+\vspace{10}
+\quad Note that $\sqrt{1-z}\approx \left( 1- \displaystyle \sum_{m=1}^{L} \beta_m \dfrac{z}{1-\alpha_m z} \right) \text{ for } z\in[0,1]$, with appropriate $L, ~\beta_m,~ \text{and}~\alpha_m$.\\
+\quad We choose the Pade coefficients,
+$$\beta_m=\dfrac{2}{2L+1}\sin^2\left(\dfrac{m\pi}{2L+1}\right), \alpha_m=\cos^2\left(\dfrac{m\pi}{2L+1} \right).$$
+
+%\quad This approximation stability has been proved using Kreiss's criterion for
+%$$ 0\leq\alpha_m<1,~\beta_m\geq0,~\text{and}~ \sum_{m=1}^{L}\dfrac{\beta_m }{1-\alpha_m z}<1 .$$
+
+
+}
+
+
+% page6
+\frame
+{
+%\frametitle{}
+\small
+$$\mathcal{F}\left(\dfrac{\partial u}{\partial y}\right)+i\omega\left(1-\sum_{m=1}^{L}\beta_m \dfrac{k_1^2}{\omega^2-\alpha_m k_1^2}\right)\mathcal{F}u=0~ \text{on}~y=0$$
+
+Something...
+
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%% Section 2 %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The High Order ABC}
+\subsection{}
+% page1
+\frame
+{
+%\frametitle{}
+\small
+\quad Consider the way for Fourier invering
+$$\mathcal{F}\left(\dfrac{\partial u}{\partial y}\right)+i\omega\left(1-\sum_{m=1}^{L}\beta_m \dfrac{k_1^2}{\omega^2-\alpha_m k_1^2}\right)\mathcal{F}u=0$$
+into the time space domain based on the use of \textcolor{red}{auxiliary functions}.\\
+\vspace{10}
+\quad We introduce the function for each $l=1,\cdots,L$
+\begin{center}
+$\mathcal{F}\varphi_l^{(2)}(k_1,\omega)=\dfrac{k_1^2}{\omega^2-\alpha_1k_1^2}\mathcal{F}u(k_1,0,\omega).$\\
+\end{center}
+
+\quad Equation become
+\begin{block}{}
+\begin{center}
+$\dfrac{d\mathcal{F}u}{d y}+i\omega \mathcal{F}u- \sum_{l=1}^{L}i\omega\beta_l \mathcal{F}\varphi_l^{(2)}=0 \\
+(\omega^2-\alpha_1k_1^2)\mathcal{F}\varphi_l^{(2)}(k_1,\omega)=k_1^2 \mathcal{F}u(k_1,0,\omega)$
+\end{center}
+\end{block}
+}
+
+
+% page2
+\frame{
+\small
+\quad Applying the Fourier transform, we obtain ABC formulation:
+\begin{block}{}
+\begin{center}
+$\dfrac{\partial u}{\partial y}(x,0,t)+\dfrac{\partial u}{\partial t}(x,0,t)- \sum_{m=1}^{L}\beta_l \dfrac{\varphi_m^{(2)}}{\partial t}(x,t)=0 \\
+\dfrac{\partial^2\varphi_l^{(2)}}{\partial t^2}(x,t)-\dfrac{\partial^2\psi_l^{(2)}}{\partial x^2}(x,t)=0~ 
+\text{with}~ \psi_l^{(2)}(x,t)=\alpha_l \varphi_l^{(2)}(x,t)+u(x,0,t)$
+\end{center}
+\end{block}
+
+$\circ$ Remark. Blah Blah...
+
+}
+
+
+
+% page3
+\frame{
+\frametitle{Interim Summary}
+\small
+
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%% Section 3 %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Corner Problem}
+
+\subsection{}
+% page1
+\frame{
+\frametitle{Analysis the Question with Corner}
+\small
+\quad Let set the problem in $\Omega=\{x<0,y<0\}$.\\
+\quad $u$ is satisfied a previous equation on $\{x=0,y<0\}$ and a below equation on $\{x<0,y=0\}$:
+
+\begin{block}{}
+\begin{center}
+$\dfrac{\partial u}{\partial x}(0,y,t)+\dfrac{\partial u}{\partial t}(0,y,t)- \sum_{m=1}^{L}\beta_l \dfrac{\varphi_m^{(1)}}{\partial t}(y,t)=0 \\
+\dfrac{\partial^2\varphi_l^{(1)}}{\partial t^2}(y,t)-\dfrac{\partial^2\psi_l^{(1)}}{\partial y^2}(y,t)=0~ 
+\text{with}~ \psi_l^{(1)}(y,t)=\alpha_l \varphi_l^{(1)}(y,t)+u(0,y,t)$
+\end{center}
+\end{block}
+$\circ$ But, there is some problem.
+\begin{enumerate}
+  \item Both equation are not enough to compute in $\Omega$.
+  \item Without additional condition, the second derivative with the auxilary functions at corner cannot be computed.
+\end{enumerate}\\
+
+}
+
+% page2
+\frame{
+%\frametitle{}
+\small
+Blah Blah\\
+$$\dfrac{3}{2}\cdot \dfrac{\partial u}{\partial t}(0,0,t)+\dfrac{\partial u}{\partial x}(0,0,t)\dfrac{\partial u}{\partial y}(0,0,t)=0$$
+
+
+}
+
+% page3
+\frame{
+%\frametitle{}
+\small
+
+\quad Add two simple reflections on each boundary and one double reflection.\\
+\quad Let
+\begin{eqnarray*}
+u(x,y,t)&=&\left(exp(ik_1x)+R^{(1)}exp(-ik_1x)\right)\\
+&&\qquad\qquad \left(exp(ik_2y)+R^{(2)}exp(-ik_2y)\right)exp(-i\omega t)
+\end{eqnarray*}
+\begin{eqnarray*}
+\varphi_l^{(1)}(y,t)=\Phi_l^{(1)}\cdot u(0,y,t),~\psi_l^{(1)}(y,t)=\Psi_l^{(1)}\cdot u(0,y,t),\\
+\varphi_l^{(2)}(x,t)=\Phi_l^{(2)}\cdot u(x,0,t),~\psi_l^{(2)}(x,t)=\Psi_l^{(2)}\cdot u(x,0,t).
+\end{eqnarray*}
+\quad Then at the corner
+\begin{eqnarray*}
+\dfrac{\partial \psi_1^{(1)}}{\partial y}(0,t)&=&+i\Psi_l^{(1)}k_2\left(1-R^{(2)}\right)\left(1+R^{(1)}\right)\exp(-i\omega t)\\
+\dfrac{\partial \psi_1^{(1)}}{\partial t}(0,t)&=&-i\Psi_l^{(1)}\omega\left(1+R^{(2)}\right)\left(1+R^{(1)}\right)\exp(-i\omega t)\\
+\dfrac{\partial \psi_m^{(2)}}{\partial t}(0,t)&=&-i\Psi_l^{(2)}\omega\left(1+R^{(2)}\right)\left(1+R^{(1)}\right)\exp(-i\omega t).
+\end{eqnarray*}
+
+}
+
+
+% page4
+\frame{
+%\frametitle{}
+\small
+
+
+\quad Using 1D wave equations, we can impose
+\begin{eqnarray*}
+\Psi_l^{(1)}=\dfrac{\omega^2}{\omega^2-\alpha_l k_2^2},&~\Phi_l^{(1)}=\dfrac{\Psi_l^{(1)}-1}{\alpha_l}=\dfrac{k_2^2}{\omega^2-\alpha_l k_2^2}\\
+\Psi_l^{(2)}=\dfrac{\omega^2}{\omega^2-\alpha_l k_1^2},&~\Phi_l^{(2)}=\dfrac{\Psi_l^{(2)}-1}{\alpha_l}=\dfrac{k_1^2}{\omega^2-\alpha_l k_1^2}
+\end{eqnarray*}
+\quad And from $u$ and all the $\psi$'s yield
+$$k_n\cdot\dfrac{1-R^{(n)}}{1+R^{(n)}}=\omega\left(\gamma-\sum_{m=1}^{L}\dfrac{\beta_m}{\alpha_m}\Psi_m^{(n)}\right)~n=1,2,~\gamma=1+\sum_{m=1}^{L}\dfrac{\beta_m}{\alpha_m}$$
+}
+
+
+% page5
+\frame{
+%\frametitle{}
+%$\Rightarrow$ 
+\begin{eqnarray*}
+\Rightarrow  k_n\left(1-R^{(n)}\right)&=&\omega\left(\gamma-\sum_{m=1}^{L}\dfrac{\beta_m}{\alpha_m}\Psi_m^{(n)}\right)\left(1+R^{(n)}\right)~ n=1,2\\
+\Rightarrow~~~  \dfrac{\partial \psi_1^{(1)}}{\partial y}(0,t) &=&i\Psi_l^{(1)}k_2\left(1-R^{(2)}\right)\left(1+R^{(1)}\right)\exp(-i\omega t)\\ &=&i\omega\Psi_l^{(1)}\cdot\left(\gamma-\sum_{m=1}^{L}\dfrac{\beta_m}{\alpha_m}\Psi_m^{(2)}\right)\\
+&&\qquad\qquad\left(1+R^{(2)}\right)\left(1+R^{(1)}\right)\exp(-i\omega t)
+\end{eqnarray*}
+
+}
+
+% page6
+\frame{
+%\frametitle{}
+\small
+By $\omega^2=k_1^2+k_2^2$,
+\begin{eqnarray*}
+\Psi_l^{(1)}\cdot \Psi_m^{(2)}&=&\dfrac{\omega^2}{\omega^2-\alpha_m k_2^2}\cdot\dfrac{\omega^2}{\omega^2-\alpha_l k_1^2}\\
+&=&\dfrac{\omega^2(\alpha_l+\alpha_m)-(k_1^2+k_2^2)\alpha_l\alpha_m}{(\omega^2-\alpha_l k_2^2)(\omega^2-\alpha_l k_1^2)}\cdot\dfrac{\omega^2}{\alpha_l+\alpha_m-\alpha_l\alpha_m}\\
+&=&\dfrac{\alpha_l\omega^2-\alpha_l\alpha_m k_1^2+\alpha_m\omega^2-\alpha_l\alpha_mk_2^2}{(\omega^2-\alpha_l k_2^2)(\omega^2-\alpha_l k_1^2)}\cdot\dfrac{\omega^2}{\alpha_l+\alpha_m-\alpha_l\alpha_m}\\
+&=&\left( \dfrac{\alpha_l}{\omega^2-\alpha_lk_2^2}+\dfrac{\alpha_m}{\omega^2-\alpha_lk_1^2}\right)\cdot\dfrac{\omega^2}{\alpha_l+\alpha_m-\alpha_l\alpha_m}\\
+&=&\dfrac{\alpha_l}{\gamma_{m,l}}\Psi_l^{(1)}+\dfrac{\alpha_m}{\gamma_{m,l}}\Psi_l^{(2)}, \qquad\gamma_{m,l}=\alpha_l+\alpha_m-\alpha_l\alpha_m
+\end{eqnarray*}
+
+}
+
+% page7
+\frame{
+%\frametitle{}
+\small
+\begin{eqnarray*}
+\Rightarrow  \dfrac{\partial \psi_1^{(1)}}{\partial y}(0,t) &=&i\omega\Psi_l^{(1)}\cdot\left(\gamma-\sum_{m=1}^{L}\dfrac{\beta_m}{\alpha_m}\Psi_m^{(2)}\right)\\
+&&\qquad\qquad\qquad\left(1+R^{(2)}\right)\left(1+R^{(1)}\right)\exp(-i\omega t)\\
+&=&i\omega\left(\gamma\Psi_l^{(1)}-\sum_{m=1}^{L}\dfrac{\beta_m\alpha_l}{\alpha_m\gamma_{m,l}}\Psi_l^{(1)}-\sum_{m=1}^{L}\dfrac{\beta_m}{\gamma_{m,l}}\Psi_m^{(2)} \right)\\
+&&\qquad\qquad\qquad\left(1+R^{(2)}\right)\left(1+R^{(1)}\right)\exp(-i\omega t)\\
+&=&-\left(\gamma-\sum_{m=1}^{L}\dfrac{\beta_m\alpha_l}{\alpha_m\gamma_{m,l}}\right)\dfrac{\partial \psi_l^{(1)}}{\partial t}(0,t)+\sum_{m=1}^{L}\dfrac{\beta_m}{\gamma_{m,l}}\dfrac{\partial \psi_m^{(2)}}{\partial t}(0,t)
+\end{eqnarray*}
+
+}
+
+% page8
+\frame{
+%\frametitle{}
+\small
+\quad Finally, 
+\begin{block}{The Conner Condition}
+\begin{eqnarray*}
+\dfrac{\partial \psi_1^{(2)}}{\partial x}(x=0,t)+A_l\cdot\dfrac{\partial \psi_l^{(2)}}{\partial t}(y=0,t)-\sum_{m=1}^{L}C_{l,m}\cdot\dfrac{\partial \psi_m^{(1)}}{\partial t}(x=0,t)=0\\
+\dfrac{\partial \psi_1^{(1)}}{\partial y}(y=0,t)+A_l\cdot\dfrac{\partial \psi_l^{(1)}}{\partial t}(x=0,t)-\sum_{m=1}^{L}C_{l,m}\cdot\dfrac{\partial \psi_m^{(2)}}{\partial t}(y=0,t)=0
+\end{eqnarray*}
+\qquad with $\displaystyle A_l=1+\sum_{m=1}^{L}\dfrac{\beta_m}{\alpha_m}-\sum_{m=1}^{L}\dfrac{\beta_m\alpha_l}{\alpha_m(\alpha_l+\alpha_m-\alpha_m\alpha_l)}$ \\
+\qquad\qquad and $C_{l,m}=\dfrac{\beta_m}{\alpha_l+\alpha_m-\alpha_m\alpha_l}$.
+\end{block}
+
+
+}
+
+%% page9
+%\frame{
+%\frametitle{}
+%\small
+%
+%}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%% Section 4 %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{A Numerical Scheme}
+
+
+%%%%%%%%%%%%%%%%%%%%%% subsection 4-1 %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{}
+% page1
+\frame{
+%\frametitle{}
+\small
+
+\begin{center}
+\includegraphics[scale=0.7]{grid2.jpg}
+\quad
+\includegraphics[scale=0.2]{point1.jpg}
+\end{center}
+%\begin{eqnarray*}
+%\text{A : X} &\rightarrow& \left(\varphi_m^{(2)}\right)_{i}^n\\
+%\text{B : }\blacklozenge &\rightarrow& \left(\varphi_m^{(1)}\right)_{j}^n\\
+%\text{D : }\blacktriangle &\rightarrow& \left(\psi_m^{(1)}\right)_{1/2}^n\\
+%\text{E : }\bigcirc &\rightarrow& \left(\varphi_m^{(2)}\right)_{1/2}^n\\
+%\text{otherwise, }& u_{i,j}^n&
+%\end{eqnarray*}
+\quad A grid is shifted in such a way that the boundary of $\Omega$ is centered between the two last lines of nodes.\\
+
+}
+
+% page2
+\frame{
+%\frametitle{}
+\small
+\quad Using the second order scheme in both space and time, wave equation is descrived :
+$$\dfrac{u_{i,j}^{n+1}-2u_{i,j}^{n}+u_{i,j}^{n-1}}{\Delta t^2} - \dfrac{u_{i+1,j}^{n}-2u_{i,j}^{n}+u_{i-1,j}^{n}}{\Delta x^2} -
+\dfrac{u_{i,j+1}^{n}-2u_{i,j}^{n}+u_{i,j-1}^{n}}{\Delta y^2}$$
+\qquad,where $(i,j)$ lie in the set of all semi integer.\\
+\vspace{10}
+\quad With this formula, one compute all the $u_{i,j}^{n+1}$ with the exception of those corresponding to nodes on the two extra-lines $x_1=\dfrac{\Delta x}{2},~y_1=\dfrac{\Delta y}{2}$.
+\newline\newline
+I Don't Know...
+}
+
+
+% page3
+\frame{
+%\frametitle{}
+\small
+
+}
+
+
+
+%% page4
+%\frame{
+%\frametitle{Linear System}
+%\small
+%\ For a linear system $u_t+Au_x=0$, $u^{*}(U_{j}^n,U_{j+1}^n)$ can be written as
+%$$u^{*}(U_{j}^n,U_{j+1}^n)=U_{j}^n+\sum_{\lambda_i <0}\alpha_i r_i =U_{j+1}^n-\sum_{\lambda_i >0}\alpha_i r_i $$
+%where $Ar_i=\lambda_ir_i$ and $U_{j+1}^n-U_{j}^n=\sum{\alpha_ir_i}=R\alpha$.\newline\newline
+%$\begin{array}{lllll}
+%F(U_{j}^n,U_{j+1}^n)&=&f(u^{*}(U_{j}^n,U_{j+1}^n)) & & \\
+%&=&Au^{*}(U_{j}^n,U_{j+1}^n)&&\\
+%&=&\displaystyle AU_{j}^n+\sum_{\lambda_i <0}\alpha_i\lambda_i r_i&=&\displaystyle AU_{j+1}^n-\sum_{\lambda_i >0}\alpha_i\lambda_i r_i\\
+%&=&\displaystyle AU_{j}^n+R\Lambda^{-}\alpha&=&\displaystyle AU_{j+1}^n-R\Lambda^{+}\alpha\\
+%&=&\displaystyle AU_{j}^n+A^{-}\left( U_{j+1}^n-U_{j}^n\right)&=&\displaystyle AU_{j+1}^n-A^{+}\left( U_{j+1}^n-U_{j}^n\right)\\
+%\end{array}$
+%
+%
+%}
+%
+%
+%
+%% page5
+%\frame{
+%\frametitle{Linear System}
+%\small
+%$\circ$ $\left\{
+%\begin{array}{lllll}
+%F(U_{j}^n,U_{j+1}^n)&=&f(u^{*}(U_{j}^n,U_{j+1}^n))&=&AU_{j}^n+A^{-}\left( U_{j+1}^n-U_{j}^n\right)\\
+%F(U_{j-1}^n,U_{j}^n)&=&f(u^{*}(U_{j-1}^n,U_{j}^n))&=&AU_{j}^n-A^{+}\left( U_{j}^n-U_{j-1}^n\right)
+%\end{array}$
+%
+%\begin{block}{Godunov's Method for the Linear System}
+%\begin{eqnarray*}
+%U_j^{n+1}&=&U_j^n-\dfrac{k}{h}\left[f(u^{*}(U_{j}^n,U_{j+1}^n))-f(u^{*}(U_{j-1}^n,U_{j}^n))\right]\\
+%&=&U_j^n-\dfrac{k}{h}\left[\dfrac{k}{h}A^{-}(U_{j+1}^n-U_{j}^n)+A^{+}(U_j^n-U_{j-1}^n)\right]
+%\end{eqnarray*}
+%\end{block}
+%$\circ$ This is the upwind method for the linear system.
+%}
+%
+%
+%% page6
+%\frame{
+%\frametitle{Entropy Condition}
+%\small
+%\ Let $\eta(u)$ be a convex entropy function and let $\psi(u)$ be a entropy flux.\\
+%\ Suppose that $\tilde{u}^n$ satisfies the entropy inequality.\\
+%
+%$$\displaystyle \frac{1}{h}\int_{x_{j-\frac{1}{2}}}^{x_{j+\frac{1}{2}}}\eta(\tilde{u}^n(x,t_{n+1}))dx\le\frac{1}{h}\int_{x_{j-\frac{1}{2}}}^{x_{j+\frac{1}{2}}}\eta(\tilde{u}^n(x,t_n))dx\\
+%\qquad\qquad\qquad\displaystyle - \frac{1}{h} \left[\int_{t_n}^{t_{n+1}}\psi(\tilde{u}^n(x_{j+\frac{1}{2}},t))dt- \int_{t_n}^{t_{n+1}}\psi(\tilde{u}^n(x_{j-\frac{1}{2}},t))dt \right]$$\newline\newline
+%
+%
+%Since $\tilde{u}^n$ is constant along $t=t_n,x=x_{j-\frac{1}{2}}$ and $x=x_{j+\frac{1}{2}}$,
+%
+%$$\displaystyle \frac{1}{h}\int_{x_{j-\frac{1}{2}}}^{x_{j+\frac{1}{2}}}\eta(\tilde{u}^n(x,t_{n+1}))dx\le\eta(U_j^n) - \frac{k}{h} \left[ \psi(u^{*}(U_{j}^n,U_{j+1}^n))-\psi(u^{*}(U_{j-1}^n,U_{j}^n)) \right].$$
+%
+%
+%}
+%
+%
+%% page7
+%\frame{
+%%\frametitle{Entropy Condition}
+%%\small
+%%Since $\eta$ is convex, by \emph{Jensen's inequality},\\
+%%$$\displaystyle\eta\left(\frac{1}{h}\int_{x_{j-\frac{1}{2}}}^{x_{j+\frac{1}{2}}}\tilde{u}^n(x,t_{n+1})dx\right)\le\frac{1}{h}\int_{x_{j-\frac{1}{2}}}^{x_{j+\frac{1}{2}}}\eta(\tilde{u}^n(x,t_{n+1}))dx$$
+%%
+%%If the numerical entropy flux $\Psi(U_{j}^n,U_{j+1}^n)=\psi(u^{*}(U_{j}^n,U_{j+1}^n))$, then
+%%
+%%
+%%$$\displaystyle \eta(U_j^{n+1})\le\eta(U_j^n) - \frac{k}{h} \left[ \Psi(U_{j}^n,U_{j+1}^n)-\psi(U_{j-1}^n,U_{j}^n) \right].$$\\
+%%$\therefore$ By Godunov's method, we can obtain \emph{entropy-satisfying solution}.
+%}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%% Reference %%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ }
+\subsection{ }
+\frame{
+\large
+\frametitle{Reference}
+\small
+
+1. Antoine, X., Arnold, A., Besse, C., Ehrhardt, M., and Schädle, A.: ‘A review of transparent and artificial boundary conditions techniques for linear and nonlinear Schrödinger equations’, 2009 \newline\newline
+2. Collino, F.: ‘ High order absorbing boundary conditions for wave propagation models: straight line boundary and corner cases’ (1993, edn.), pp. 161-171\newline\newline
+3. Engquist, B., and Majda, A.: ‘ Absorbing boundary conditions for numerical simulation of waves’, Proceedings of the National Academy of Sciences, 1977, 74, (5), pp. 1765-1766\newline\newline
+4. Givoli, D.: ‘High-order local non-reflecting boundary conditions: a review’, Wave Motion, 2004, 39, (4), pp. 319-326\newline\newline
+
+
+
+}
+%%%%%%%%%%%%%%%%%%%%%% Thank you %%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ }
+\subsection{ }
+\frame{
+\large
+\frametitle{}
+\ $$\textbf{Thank you!}$$
+}
+
+
+
+
+\end{document}
