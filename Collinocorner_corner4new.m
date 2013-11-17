@@ -44,19 +44,19 @@ end
 syms x y t
 % u_tt = u_xx + u_yy 
 % u(x,y,0) = @(x,y) exp(i*(pi*x+pi*y)) , u_t(x,y,0) = -sqrt(2)*pi*i*exp(i*(pi*x+pi*y)) : initial condition
-% u = @(x,y) exp(1i*(pi*x+pi*y));
-% v = @(x,y,t) exp(1i*(pi*x+pi*y-sqrt(2)*pi*t));
-% u_t = @(x,y) -sqrt(2)*pi*1i*exp(1i*(pi*x+pi*y));
-u = @(x,y) exp(1i*(pi*x+0*y));
-u_t = @(x,y) -pi*1i * exp(1i*(pi*x+0*y));
-v = @(x,y,t) exp(1i*(pi*x+0*y-pi*t));
+u = @(x,y) exp(1i*(pi*x+pi*y));
+v = @(x,y,t) exp(1i*(pi*x+pi*y-sqrt(2)*pi*t));
+u_t = @(x,y) -sqrt(2)*pi*1i*exp(1i*(pi*x+pi*y));
+% u = @(x,y) exp(1i*(pi*x+0*y));
+% u_t = @(x,y) -pi*1i * exp(1i*(pi*x+0*y));
+% v = @(x,y,t) exp(1i*(pi*x+0*y-pi*t));
 %  u = @(x,y) exp(i*(pi*x+pi*y));
 %  v = @(x,y,t) exp(sqrt(-1)*(pi*x+pi*y-sqrt(2)*pi*t));
 %  u_t = @(x,y) -sqrt(2)*pi*i*exp(i*(pi*x+pi*y));
 
 [X,Y] = meshgrid(-dx/2:dx:Xlength+dx/2,-dy/2:dy:Ylength+dy/2); 
 % [Y,X] = meshgrid(-dy/2:dy:Ylength+dy/2,-dx/2:dx:Xlength+dx/2); 
-%% get initial data for u0, phi0 
+%% get initial data for U0, PHI0 
 
 U(:,:,1) = u(X,Y) - dt/2* u_t(X,Y);
 U(:,:,2) = u(X,Y) + dt/2* u_t(X,Y); 
@@ -85,9 +85,12 @@ for l=1:L
 end
 
 
-%% updating u at interior nodes
+%% Main iteration
+
 for n=2:Nt-1
-qq=1;  
+    qq=1;  
+
+%% updating U at interior nodes
 for i=2:Nx-1
     for j=2:Ny-1
 U(j,i,n+1) = 2*U(j,i,n) - U(j,i,n-1) +(dt^2)/(dx^2)*(U(j,i+1,n)-2*U(j,i,n) +U(j,i-1,n)) +...
@@ -96,7 +99,7 @@ U(j,i,n+1) = 2*U(j,i,n) - U(j,i,n-1) +(dt^2)/(dx^2)*(U(j,i+1,n)-2*U(j,i,n) +U(j,
 end
 
 
-%% update phi 
+%% update PHI 
 
 
 for i= 2: Nx-1
@@ -135,33 +138,33 @@ Phi_4temp = Phi_4(:,:,2) ;
 Phi_4(:,:,2) = Phi_4(:,:,1);
 Phi_4(:,:,1) = Phi_4temp;
 
-%% update u at boundary nodes
+%% update U at boundary nodes
 
-tempsum1 = zeros(1,Ny);
-tempsum2 = zeros(1,Nx);
-tempsum3 = zeros(1,Ny);
-tempsum4 = zeros(1,Nx);
+tempsum1 = zeros(1,Ny-2);
+tempsum2 = zeros(1,Nx-2);
+tempsum3 = zeros(1,Ny-2);
+tempsum4 = zeros(1,Nx-2);
 
 for l=1:L
-    tempsum1 = tempsum1 + beta(l)* (Phi_1(l,:,2)-Phi_1(l,:,1));
-    tempsum2 = tempsum2 + beta(l)* (Phi_2(l,:,2)-Phi_2(l,:,1));
-    tempsum3 = tempsum3 + beta(l)* (Phi_3(l,:,2)-Phi_3(l,:,1));
-    tempsum4 = tempsum4 + beta(l)* (Phi_4(l,:,2)-Phi_4(l,:,1));
+    tempsum1 = tempsum1 + beta(l)* 1/dt* (Phi_1(l,2:Ny-1,2)-Phi_1(l,2:Ny-1,1));
+    tempsum2 = tempsum2 + beta(l)* 1/dt* (Phi_2(l,2:Nx-1,2)-Phi_2(l,2:Nx-1,1));
+    tempsum3 = tempsum3 + beta(l)* 1/dt* (Phi_3(l,2:Ny-1,2)-Phi_3(l,2:Ny-1,1));
+    tempsum4 = tempsum4 + beta(l)* 1/dt* (Phi_4(l,2:Nx-1,2)-Phi_4(l,2:Nx-1,1));
 end
 
-U(:,1,n+1) = (2*dt*dy)/(dt+dy) *((1/(2*dy) - 1/(2*dt))*U(:,2,n+1) + (1/(2*dt) + 1/(2*dy))*U(:,2,n) + (1/(2*dt) - 1/(2*dy))*U(:,1,n)) +...
-    +(2*dy)/(dt+dy) * transpose(tempsum1);
+U(2:Ny-1,1,n+1) = -2/(1/dt-1/dx) *((+1/(2*dx) + 1/(2*dt))*U(2:Ny-1,2,n+1) + (-1/(2*dt) + 1/(2*dx))*U(2:Ny-1,2,n) + (-1/(2*dt) - 1/(2*dx))*U(2:Ny-1,1,n)) +...
+    +2/(1/dt-1/dx) *transpose(tempsum1);
 
-U(1,:,n+1) = (2*dt*dx)/(dt+dx) *((1/(2*dx) - 1/(2*dt))*U(2,:,n+1) + (1/(2*dt) + 1/(2*dx))*U(2,:,n) + (1/(2*dt) - 1/(2*dx))*U(1,:,n)) +...
-    +(2*dx)/(dt+dx) * tempsum2;
+U(1,2:Nx-1,n+1) = -2/(1/dt-1/dy) *((1/(2*dy) + 1/(2*dt))*U(2,2:Nx-1,n+1) + (-1/(2*dt) + 1/(2*dy))*U(2,2:Nx-1,n) + (-1/(2*dt) - 1/(2*dy))*U(1,2:Nx-1,n)) +...
+    +2/(1/dt-1/dy) *tempsum2;
 
-U(:,Nx,n+1) = (2*dt*dy)/(dt+dy) *((1/(2*dy) - 1/(2*dt))*U(:,Nx-1,n+1) + (1/(2*dt) + 1/(2*dy))*U(:,Nx-1,n) + (1/(2*dt) - 1/(2*dy))*U(:,Nx,n)) +...
-    +(2*dy)/(dt+dy) * transpose(tempsum3);
+U(2:Ny-1,Nx,n+1) = -2/(1/dt+1/dx) *((-1/(2*dx) + 1/(2*dt))*U(2:Ny-1,Nx-1,n+1) + (-1/(2*dt) - 1/(2*dx))*U(2:Ny-1,Nx-1,n) + (-1/(2*dt) + 1/(2*dx))*U(2:Ny-1,Nx,n)) +...
+    +2/(1/dt+1/dx) *transpose(tempsum3);
 
-U(Ny,:,n+1) = (2*dt*dx)/(dt+dx) *((1/(2*dx) - 1/(2*dt))*U(Ny-1,:,n+1) + (1/(2*dt) + 1/(2*dx))*U(Ny-1,:,n) + (1/(2*dt) - 1/(2*dx))*U(Ny,:,n)) +...
-    +(2*dx)/(dt+dx) * tempsum4;
+U(Ny,2:Nx-1,n+1) = -2/(1/dt+1/dy) *((-1/(2*dy) + 1/(2*dt))*U(Ny-1,2:Nx-1,n+1) + (-1/(2*dt) - 1/(2*dy))*U(Ny-1,2:Nx-1,n) + (-1/(2*dt) + 1/(2*dy))*U(Ny,2:Nx-1,n)) +...
+    +2/(1/dt+1/dy) *tempsum4;
 
-%% update psi except at corner nodes
+%% update PSI except at corner nodes
 
 for l=1:L
         
@@ -196,7 +199,7 @@ Psi_4temp = Psi_4(:,:,2) ;
 Psi_4(:,:,2) = Psi_4(:,:,1);
 Psi_4(:,:,1) = Psi_4temp;
 
-%% update psi at corner node by solving 2L equations.
+%% update PSI at corner node by solving 2L equations.
 
 % M1, M2, M : linear system of 2L unkowns(in order to find PSI1, PSI2 at corner)
 for i=1:L
