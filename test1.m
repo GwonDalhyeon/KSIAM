@@ -33,9 +33,6 @@ angle = [pi/(2*L+1): pi/(2*L+1) : L*pi/(2*L+1)];
 alpha = (cos(angle)).^2;
 beta =  2/(2*L+1) * (sin(angle)).^2;
 
-gap1=zeros(Nt,2);
-gap1=zeros(Nt,2);
-
 for l=1:L
     for m=1:L
           C(l,m) = beta(m)/(alpha(l)+alpha(m)-alpha(l)*alpha(m));
@@ -48,9 +45,9 @@ syms x y t
 % u_tt = u_xx + u_yy 
 % u(x,y,0) = @(x,y) exp(i*(pi*x+pi*y)) , u_t(x,y,0) = -sqrt(2)*pi*i*exp(i*(pi*x+pi*y)) : initial condition
 
-u = @(x,y) exp(-1i*(pi*x+pi*y));
+u = @(x,y) exp(1i*(pi*x+pi*y));
 v = @(x,y,t) exp(1i*(pi*x+pi*y-sqrt(2)*pi*t));
-u_t = @(x,y) sqrt(2)*pi*1i*exp(1i*(pi*x+pi*y));
+u_t = @(x,y) -sqrt(2)*pi*1i*exp(1i*(pi*x+pi*y));
 
 % u = @(x,y) exp(1i*(pi*x+0*y));
 % u_t = @(x,y) -pi*1i * exp(1i*(pi*x+0*y));
@@ -162,11 +159,11 @@ for l=1:L
     tempsum4 = tempsum4 + beta(l)* 1/dt* (Phi_4(l,2:Nx-1,2)-Phi_4(l,2:Nx-1,1));
 end
 
-U(2:Ny-1,1,n+1) = -2/(-1/dt-1/dx) *((+1/(2*dx) - 1/(2*dt))*U(2:Ny-1,2,n+1) + (+1/(2*dt) + 1/(2*dx))*U(2:Ny-1,2,n) + (+1/(2*dt) - 1/(2*dx))*U(2:Ny-1,1,n)) +...
-    -2/(-1/dt-1/dx) *transpose(tempsum1);
+U(2:Ny-1,1,n+1) = -2/(1/dt-1/dx) *((+1/(2*dx) + 1/(2*dt))*U(2:Ny-1,2,n+1) + (-1/(2*dt) + 1/(2*dx))*U(2:Ny-1,2,n) + (-1/(2*dt) - 1/(2*dx))*U(2:Ny-1,1,n)) +...
+    +2/(1/dt-1/dx) *transpose(tempsum1);
 
-U(1,2:Nx-1,n+1) = -2/(-1/dt-1/dy) *((1/(2*dy) - 1/(2*dt))*U(2,2:Nx-1,n+1) + (+1/(2*dt) + 1/(2*dy))*U(2,2:Nx-1,n) + (+1/(2*dt) - 1/(2*dy))*U(1,2:Nx-1,n)) +...
-    -2/(-1/dt-1/dy) *tempsum2;
+U(1,2:Nx-1,n+1) = -2/(1/dt-1/dy) *((1/(2*dy) + 1/(2*dt))*U(2,2:Nx-1,n+1) + (-1/(2*dt) + 1/(2*dy))*U(2,2:Nx-1,n) + (-1/(2*dt) - 1/(2*dy))*U(1,2:Nx-1,n)) +...
+    +2/(1/dt-1/dy) *tempsum2;
 
 U(2:Ny-1,Nx,n+1) = -2/(1/dt+1/dx) *((-1/(2*dx) + 1/(2*dt))*U(2:Ny-1,Nx-1,n+1) + (-1/(2*dt) - 1/(2*dx))*U(2:Ny-1,Nx-1,n) + (-1/(2*dt) + 1/(2*dx))*U(2:Ny-1,Nx,n)) +...
     +2/(1/dt+1/dx) *transpose(tempsum3);
@@ -435,10 +432,9 @@ Psi_ED4 = MM4\b(:,1,4) ;
 
     Un = U(:,:,n);
     Vn = abs(U(:,:,n)-U(:,:,n-1));
-    gap1(n,:) = [n,max(max(Vn))];
+    Wn = max(max(Vn));
     Qn = v(X,Y,(n-3/2)*dt);
     Rn = abs(U(:,:,n)-Qn);
-    gap2(n,:)= [n,max(max(Rn))];
 end
 % figure
 % axis([-0.2 1.2 -0.2 1.2 -0.1 2]) 
@@ -449,13 +445,13 @@ end
 %     
 %     pause(0.5)
 % end
-% for n=1:20:Nt
-%     
-%      surf(X(2:Ny-1,2:Nx-1),Y(2:Ny-1,2:Nx-1),real(U(2:Ny-1,2:Nx-1,n)))
-%     
-%     
-%     pause(0.5)
-% end
+for n=1:20:Nt
+    
+     surf(X(2:Ny-1,2:Nx-1),Y(2:Ny-1,2:Nx-1),real(U(2:Ny-1,2:Nx-1,n)))
+    
+    
+    pause(0.5)
+end
 
 % for n=1:20:Nt
 %     
