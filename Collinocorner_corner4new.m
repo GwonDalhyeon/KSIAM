@@ -1,9 +1,10 @@
 % function Collinocorner(L)
 clc
 clear all
+close all
 %% Constants and Variables
 L=5;
-Tlength=1;
+Tlength=.5;
 Xlength = 1;
 Ylength = 1;
 dx = 1/50;
@@ -27,6 +28,11 @@ Mxp = zeros(L) ;
 Mxm = zeros(L) ;
 Myp = zeros(L) ;
 Mym = zeros(L) ;
+Mxptm = zeros(L) ; 
+Mxmtm = zeros(L) ;
+Myptm = zeros(L) ;
+Mymtm = zeros(L) ;
+
 M = zeros(L);
 b = zeros(2*L,1,4);
 angle = [pi/(2*L+1): pi/(2*L+1) : L*pi/(2*L+1)];
@@ -48,9 +54,17 @@ syms x y t
 % u_tt = u_xx + u_yy 
 % u(x,y,0) = @(x,y) exp(i*(pi*x+pi*y)) , u_t(x,y,0) = -sqrt(2)*pi*i*exp(i*(pi*x+pi*y)) : initial condition
 
-u = @(x,y) exp(-1i*(pi*x+pi*y));
-v = @(x,y,t) exp(1i*(pi*x+pi*y-sqrt(2)*pi*t));
-u_t = @(x,y) sqrt(2)*pi*1i*exp(1i*(pi*x+pi*y));
+% u = @(x,y) exp(1i*(pi*x+pi*y));
+% v = @(x,y,t) exp(1i*(pi*x+pi*y-sqrt(2)*pi*t));
+% u_t = @(x,y) -sqrt(2)*pi*1i*exp(1i*(pi*x+pi*y));
+
+%  u = @(x,y) exp(1i*(pi*x+pi*y));
+%  v = @(x,y,t) exp(sqrt(-1)*(pi*x+pi*y-sqrt(2)*pi*t));
+%  u_t = @(x,y) +sqrt(2)*pi*i*exp(1i*(pi*x+pi*y));
+
+% u = @(x,y) exp(-1i*(sqrt(3)*pi*x+sqrt(1)*pi*y));
+% v = @(x,y,t) exp(1i*(pi*x+pi*y-sqrt(2)*pi*t));
+% u_t = @(x,y) -2*pi*1i*exp(-1i*(sqrt(3)*pi*x+sqrt(1)*pi*y));
 
 % u = @(x,y) exp(1i*(pi*x+0*y));
 % u_t = @(x,y) -pi*1i * exp(1i*(pi*x+0*y));
@@ -60,9 +74,9 @@ u_t = @(x,y) sqrt(2)*pi*1i*exp(1i*(pi*x+pi*y));
 % u_t = @(x,y) -pi*1i * exp(1i*(-pi*y+0*x));
 % v = @(x,y,t) exp(1i*(-pi*y+0*x+pi*t));
 
-%  u = @(x,y) exp(i*(pi*x+pi*y));
-%  v = @(x,y,t) exp(sqrt(-1)*(pi*x+pi*y-sqrt(2)*pi*t));
-%  u_t = @(x,y) -sqrt(2)*pi*i*exp(i*(pi*x+pi*y));
+u = @(x,y) besselj(0,10*sqrt((x-0.5).^2+(y-0.5).^2));
+v = @(x,y,t) besselj(0,10*sqrt((x-0.5).^2+(y-0.5).^2)).*cos(t);
+u_t = @(x,y) 0;
 
 [X,Y] = meshgrid(-dx/2:dx:Xlength+dx/2,-dy/2:dy:Ylength+dy/2); 
 % [Y,X] = meshgrid(-dy/2:dy:Ylength+dy/2,-dx/2:dx:Xlength+dx/2); 
@@ -98,7 +112,7 @@ end
 %% Main iteration
 
 for n=2:Nt-1
-    qq=1;  
+
 
 %% updating U at interior nodes
 for i=2:Nx-1
@@ -163,10 +177,10 @@ for l=1:L
 end
 
 U(2:Ny-1,1,n+1) = -2/(-1/dt-1/dx) *((+1/(2*dx) - 1/(2*dt))*U(2:Ny-1,2,n+1) + (+1/(2*dt) + 1/(2*dx))*U(2:Ny-1,2,n) + (+1/(2*dt) - 1/(2*dx))*U(2:Ny-1,1,n)) +...
-    -2/(-1/dt-1/dx) *transpose(tempsum1);
+    +2/(-1/dt-1/dx) *transpose(tempsum1);
 
 U(1,2:Nx-1,n+1) = -2/(-1/dt-1/dy) *((1/(2*dy) - 1/(2*dt))*U(2,2:Nx-1,n+1) + (+1/(2*dt) + 1/(2*dy))*U(2,2:Nx-1,n) + (+1/(2*dt) - 1/(2*dy))*U(1,2:Nx-1,n)) +...
-    -2/(-1/dt-1/dy) *tempsum2;
+    +2/(-1/dt-1/dy) *tempsum2;
 
 U(2:Ny-1,Nx,n+1) = -2/(1/dt+1/dx) *((-1/(2*dx) + 1/(2*dt))*U(2:Ny-1,Nx-1,n+1) + (-1/(2*dt) - 1/(2*dx))*U(2:Ny-1,Nx-1,n) + (-1/(2*dt) + 1/(2*dx))*U(2:Ny-1,Nx,n)) +...
     +2/(1/dt+1/dx) *transpose(tempsum3);
@@ -178,10 +192,10 @@ U(Ny,2:Nx-1,n+1) = -2/(1/dt+1/dy) *((-1/(2*dy) + 1/(2*dt))*U(Ny-1,2:Nx-1,n+1) + 
 
 for l=1:L
         
-    Psi_1(l,2:Ny-1,1) = alpha(l)*Phi_1(l,2:Ny-1,2) + 1/2 * transpose(U(2:Ny-1,1,2)+U(2:Ny-1,2,2));
-    Psi_2(l,2:Nx-1,1) = alpha(l)*Phi_2(l,2:Nx-1,2) + 1/2 * (U(1,2:Nx-1,2)+U(2,2:Nx-1,2));
-    Psi_3(l,2:Ny-1,1) = alpha(l)*Phi_3(l,2:Ny-1,2) + 1/2 * transpose(U(2:Ny-1,Nx,2)+U(2:Ny-1,Nx-1,2));
-    Psi_4(l,2:Nx-1,1) = alpha(l)*Phi_4(l,2:Nx-1,2) + 1/2 * (U(Ny,2:Nx-1,2)+U(Ny-1,2:Nx-1,2));
+    Psi_1(l,2:Ny-1,1) = alpha(l)*Phi_1(l,2:Ny-1,2) + 1/2 * transpose(U(2:Ny-1,1,n+1)+U(2:Ny-1,2,n+1));
+    Psi_2(l,2:Nx-1,1) = alpha(l)*Phi_2(l,2:Nx-1,2) + 1/2 * (U(1,2:Nx-1,n+1)+U(2,2:Nx-1,n+1));
+    Psi_3(l,2:Ny-1,1) = alpha(l)*Phi_3(l,2:Ny-1,2) + 1/2 * transpose(U(2:Ny-1,Nx,n+1)+U(2:Ny-1,Nx-1,n+1));
+    Psi_4(l,2:Nx-1,1) = alpha(l)*Phi_4(l,2:Nx-1,2) + 1/2 * (U(Ny,2:Nx-1,n+1)+U(Ny-1,2:Nx-1,n+1));
 end
 
 %Psi(:,:,1) - n+1 time
@@ -208,7 +222,11 @@ Psi_3(:,:,1) = Psi_3temp;
 Psi_4temp = Psi_4(:,:,2) ;
 Psi_4(:,:,2) = Psi_4(:,:,1);
 Psi_4(:,:,1) = Psi_4temp;
-
+psi_1n=Psi_1(:,:,2);
+psi_2n=Psi_2(:,:,2);
+psi_3n=Psi_3(:,:,2);
+psi_4n=Psi_4(:,:,2);
+    qq=1;  
 %% update PSI at corner node by solving 2L equations.
 
 % M1, M2, M : linear system of 2L unkowns(in order to find PSI1, PSI2 at corner)
@@ -217,13 +235,19 @@ for i=1:L
     Mxm(i,i) = -1/(2*dx) + A(i)/(2*dt);
     Myp(i,i) = 1/(2*dy) + A(i)/(2*dt);
     Mym(i,i) = -1/(2*dy) + A(i)/(2*dt);
+    
+    Mxptm(i,i) = 1/(2*dx) - A(i)/(2*dt);
+    Mxmtm(i,i) = -1/(2*dx) - A(i)/(2*dt);
+    Myptm(i,i) = 1/(2*dy) - A(i)/(2*dt);
+    Mymtm(i,i) = -1/(2*dy) - A(i)/(2*dt);
     for j=1:L
         M(i,j) = -C(i,j)/(2*dt);
     end
 end
         
-MM1 = [Mxm M ; M Mym];
-MM2 = [Mxp M ; M Mym];
+% MM1 = [Mxm M ; M Mym];
+MM1 = [Mxmtm -M ; -M Mymtm];
+MM2 = [Mxptm -M ; -M Mymtm];
 MM3 = [Mxp M ; M Myp];
 MM4 = [Mxm M ; M Myp];
 
@@ -288,31 +312,31 @@ for l=1:L
     temp3 = 0;
     if i==1
    
-    b(l,1,1) = (A(l)/(2*dt) + 1/(2*dx)) * Psi_corner_old(l,1,1) +...
-        (-A(l)/(2*dt) - 1/(2*dx)) * Psi_corner_new(l,4,1)+...
-        (A(l)/(2*dt) - 1/(2*dx)) * Psi_corner_old(l,4,1) ;
+    b(l,1,1) = (-A(l)/(2*dt) + 1/(2*dx)) * Psi_corner_old(l,1,1) +...
+        (A(l)/(2*dt) - 1/(2*dx)) * Psi_corner_new(l,4,1)+...
+        (-A(l)/(2*dt) - 1/(2*dx)) * Psi_corner_old(l,4,1) ;
     
     for m=1:L
         temp1 = temp1 + C(l,m)/(2*dt) * Psi_corner_new(m,3,1);
         temp2 = temp2 - C(l,m)/(2*dt) * Psi_corner_old(m,2,1);
         temp3 = temp3 - C(l,m)/(2*dt) * Psi_corner_old(m,3,1);
     end
-    b(l,1,1)=b(l,1,1) + temp1 + temp2 + temp3 ;
+    b(l,1,1)=b(l,1,1) - temp1 - temp2 - temp3 ;
     
     end
     
     if i==2
         
-    b(l,1,2) = (A(l)/(2*dt) + 1/(2*dx)) * Psi_corner_old(l,1,2) +...
-        (-A(l)/(2*dt) + 1/(2*dx)) * Psi_corner_new(l,1,2)+...
-        (A(l)/(2*dt) - 1/(2*dx)) * Psi_corner_old(l,4,2) ;
+    b(l,1,2) = (-A(l)/(2*dt) + 1/(2*dx)) * Psi_corner_old(l,1,2) +...
+        (+A(l)/(2*dt) + 1/(2*dx)) * Psi_corner_new(l,1,2)+...
+        (-A(l)/(2*dt) - 1/(2*dx)) * Psi_corner_old(l,4,2) ;
     
     for m=1:L
         temp1 = temp1 + C(l,m)/(2*dt) * Psi_corner_new(m,3,2);
         temp2 = temp2 - C(l,m)/(2*dt) * Psi_corner_old(m,2,2);
         temp3 = temp3 - C(l,m)/(2*dt) * Psi_corner_old(m,3,2);
     end
-    b(l,1,2)=b(l,1,2) + temp1 + temp2 + temp3 ;
+    b(l,1,2)=b(l,1,2) - temp1 - temp2 - temp3 ;
         
     end
     
@@ -358,28 +382,28 @@ for l=1:L
         
     if i==1
         
-    b(l+L,1,1) = (A(l)/(2*dt) + 1/(2*dy)) * Psi_corner_old(l,2,1) +...
-        (-A(l)/(2*dt) - 1/(2*dy)) * Psi_corner_new(l,3,1)+...
-        (A(l)/(2*dt) - 1/(2*dy)) * Psi_corner_old(l,3,1) ;
+    b(l+L,1,1) = (-A(l)/(2*dt) + 1/(2*dy)) * Psi_corner_old(l,2,1) +...
+        (+A(l)/(2*dt) - 1/(2*dy)) * Psi_corner_new(l,3,1)+...
+        (-A(l)/(2*dt) - 1/(2*dy)) * Psi_corner_old(l,3,1) ;
         for m=1:L
             temp1 = temp1 + C(l,m)/(2*dt) * Psi_corner_new(m,4,1);
             temp2 = temp2 - C(l,m)/(2*dt) * Psi_corner_old(m,1,1);
             temp3 = temp3 - C(l,m)/(2*dt) * Psi_corner_old(m,4,1);
         end
-    b(l+L,1,1)=b(l+L,1,1) + temp1 + temp2 + temp3 ;
+    b(l+L,1,1)=b(l+L,1,1) - temp1 - temp2 - temp3 ;
     end
     
     if i==2
         
-    b(l+L,1,2) = (A(l)/(2*dt) + 1/(2*dy)) * Psi_corner_old(l,2,2) +...
-        (-A(l)/(2*dt) - 1/(2*dy)) * Psi_corner_new(l,3,2)+...
-        (A(l)/(2*dt) - 1/(2*dy)) * Psi_corner_old(l,3,2) ;
+    b(l+L,1,2) = (-A(l)/(2*dt) + 1/(2*dy)) * Psi_corner_old(l,2,2) +...
+        (+A(l)/(2*dt) - 1/(2*dy)) * Psi_corner_new(l,3,2)+...
+        (-A(l)/(2*dt) - 1/(2*dy)) * Psi_corner_old(l,3,2) ;
         for m=1:L
             temp1 = temp1 + C(l,m)/(2*dt) * Psi_corner_new(m,1,2);
             temp2 = temp2 - C(l,m)/(2*dt) * Psi_corner_old(m,4,2);
             temp3 = temp3 - C(l,m)/(2*dt) * Psi_corner_old(m,1,2);
         end
-    b(l+L,1,2)=b(l+L,1,2) + temp1 + temp2 + temp3 ;
+    b(l+L,1,2)=b(l+L,1,2) - temp1 - temp2 - temp3 ;
     end
     
      if i==3
@@ -436,12 +460,12 @@ Psi_ED4 = MM4\b(:,1,4) ;
     Un = U(:,:,n);
     Vn = abs(U(:,:,n)-U(:,:,n-1));
     gap1(n,:) = [n,max(max(Vn))];
-    Qn = v(X,Y,(n-3/2)*dt);
-    Rn = abs(U(:,:,n)-Qn);
+    Qn = v(X(10:Ny-1,10:Nx-1),Y(10:Ny-1,10:Nx-1),(n-3/2)*dt);
+    Rn = abs(U(10:Ny-1,10:Nx-1,n)-Qn);
     gap2(n,:)= [n,max(max(Rn))];
 end
-% figure
-% axis([-0.2 1.2 -0.2 1.2 -0.1 2]) 
+
+
 % for n=1:20:Nt
 %     
 %      surf(X(10:Ny-1,10:Nx-1),Y(10:Ny-1,10:Nx-1),real(U(10:Ny-1,10:Nx-1,n)))
@@ -449,17 +473,19 @@ end
 %     
 %     pause(0.5)
 % end
-% for n=1:20:Nt
+figure,
+for n=1:20:Nt   
+    
+     surf(X(2:Ny-1,2:Nx-1),Y(2:Ny-1,2:Nx-1),real(U(2:Ny-1,2:Nx-1,1))) , axis([0 1 0 1 -1 1]);
+    
+    
+    pause(0.5)
+end
+% 
+% figure,
+% for n=1:20:Nt*100
 %     
-%      surf(X(2:Ny-1,2:Nx-1),Y(2:Ny-1,2:Nx-1),real(U(2:Ny-1,2:Nx-1,n)))
-%     
-%     
-%     pause(0.5)
-% end
-
-% for n=1:20:Nt
-%     
-%     surf(X,Y,real(v(X,Y,(n-3/2)*dt)))
+%     surf(X,Y,real(v(X,Y,(n-3/2)*dt))), axis([0 1 0 1 -1 1]);
 %     pause(0.5)
 % end
 
